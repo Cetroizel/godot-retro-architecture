@@ -321,7 +321,17 @@ Sans ça, `Pokemon.take_damage()` devrait appeler directement l'UI **et** la log
 
 Le mécanisme réel est plus intéressant que la version courante, parce qu'il faut **deux** bugs pour le produire.
 
-**Premier bug — un cache partiel jamais invalidé.** Le tutoriel du Vieil Homme copie le nom du joueur (`wPlayerName`, 11 octets) dans la zone qui sert normalement aux données de rencontre en herbe, pour afficher « OLD MAN » dans le combat de démonstration. Le commentaire du désassemblage est explicite : *« Since wLinkEnemyTrainerName == wGrassRate, this affects wild encounters »*. `$D887` n'est pas « la zone des données de rencontre » en bloc : c'est précisément `wGrassRate`, **l'octet de taux** de rencontre. Les 11 octets du nom occupent `$D887`–`$D891`, soit ce taux **plus les cinq premiers créneaux** de `wGrassMons` (`$D888`–`$D89B`, 10 paires niveau/espèce).
+**Premier bug — un cache partiel jamais invalidé.** Le tutoriel du Vieil Homme copie le nom du joueur (`wPlayerName`, 11 octets) dans la zone qui sert normalement aux données de rencontre en herbe, pour afficher « OLD MAN » dans le combat de démonstration. Le commentaire du désassemblage est explicite : *« Since wLinkEnemyTrainerName == wGrassRate, this affects wild encounters »*. Ce n'est pas « la zone des données de rencontre » en bloc : c'est précisément `wGrassRate`, **l'octet de taux** de rencontre. Le `wram.asm` de pokered le déclare dans une `UNION`, immédiatement suivi de `wGrassMons` :
+
+```
+UNION
+wGrassRate:: db
+wGrassMons:: ds WILDDATA_LENGTH - 1
+```
+
+Les 11 octets du nom couvrent donc ce taux **plus les cinq premiers créneaux** de la table (10 paires niveau/espèce en tout).
+
+*(Les adresses numériques `$D887`–`$D891` circulent dans la documentation communautaire mais viennent de révisions anciennes de pokered ; la version courante n'expose que les labels. Elles ne sont pas vérifiables dans les fichiers cités ci-dessous, et le raisonnement n'en dépend pas.)*
 
 Or `LoadWildData` n'écrase le tableau **que si l'octet de taux de la nouvelle carte est non nul** :
 

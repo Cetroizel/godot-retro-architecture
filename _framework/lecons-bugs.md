@@ -21,7 +21,7 @@ Les quatre premières familles concernent une **donnée invalide lue**. Les deux
 
 ## 1. Lecture non réinitialisée — Pokémon (MissingNo)
 
-Un emplacement mémoire sert deux usages selon le moment. Le tutoriel du Vieil Homme copie le nom du joueur dans la zone des données de rencontre en herbe, pour afficher « OLD MAN » — l'adresse concernée, `$D887`, est précisément `wGrassRate`, **l'octet de taux** de rencontre, et les onze octets du nom débordent sur les cinq premiers créneaux de la table.
+Un emplacement mémoire sert deux usages selon le moment. Le tutoriel du Vieil Homme copie le nom du joueur dans la zone des données de rencontre en herbe, pour afficher « OLD MAN » — l'emplacement concerné est précisément `wGrassRate`, **l'octet de taux** de rencontre — déclaré dans une `UNION` juste avant `wGrassMons` — et les onze octets du nom débordent sur les cinq premiers créneaux de la table.
 
 **Le point que la version précédente de ce document manquait** : l'invalidation existe. Elle est simplement **conditionnée à la donnée entrante** —
 
