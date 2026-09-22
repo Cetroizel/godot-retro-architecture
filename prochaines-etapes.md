@@ -56,8 +56,9 @@ extends Resource
 @export_range(50.0, 600.0) var speed_min: float = 150.0
 @export_range(50.0, 600.0) var speed_max: float = 250.0
 @export var score_value: int = 1
-@export var behavior: MobBehavior          ## rempli à l'étape 2.1
 ```
+
+Volontairement **pas** de champ `behavior` ici : il arrive à l'étape 2.1. Un `@export` typé sur une classe qui n'existe pas encore empêche le script de parser — Godot ne compile pas une déclaration dont il ne connaît pas le type. C'est le premier endroit où l'ordre des étapes n'est pas cosmétique.
 
 Puis `mob.gd` référence son type au lieu de porter ses valeurs :
 
@@ -123,9 +124,15 @@ L'étape la plus formatrice de la roadmap, parce que **rien ne doit changer à l
 class_name MobBehavior
 extends Resource
 
-## Appelé une fois au spawn, après setup().
+## Appelé une fois au spawn, après setup(). Le comportement par défaut
+## est celui du jeu actuel : partir tout droit et ne plus rien décider.
+##
+## La vitesse est rangée sur le MOB et non sur ce Resource, parce que
+## le Resource est PARTAGÉ entre tous les mobs de ce type : y stocker
+## une valeur par instance les ferait tous bouger ensemble.
 func on_spawn(mob: RigidBody2D, direction: float, speed: float) -> void:
-	pass
+	mob.set_meta(&"speed", speed)
+	mob.linear_velocity = Vector2(speed, 0.0).rotated(direction)
 
 ## Appelé à chaque frame physique. Vide par défaut : un mob qui va
 ## tout droit n'a rien à faire, la vélocité initiale suffit.
@@ -133,15 +140,9 @@ func update(mob: RigidBody2D, delta: float) -> void:
 	pass
 ```
 
-```gdscript
-class_name StraightBehavior
-extends MobBehavior
+`StraightBehavior` n'a donc **rien à écrire** — c'est la classe de base telle quelle. Créer une sous-classe vide juste pour lui donner un nom est une option ; s'en passer en est une autre, et c'est celle que je retiens.
 
-func on_spawn(mob: RigidBody2D, direction: float, speed: float) -> void:
-	mob.linear_velocity = Vector2(speed, 0.0).rotated(direction)
-```
-
-Le `MobSpawner` délègue : `type.behavior.on_spawn(mob, direction, speed)`. Et `mob.gd` appelle `type.behavior.update(self, delta)` dans `_physics_process`.
+Le `MobSpawner` délègue entièrement : **retire de `spawn_at()` la ligne qui pose `linear_velocity`** et remplace-la par `type.behavior.on_spawn(mob, direction, speed)`. Sans ça, deux endroits décident de la vélocité et le comportement n'a jamais la main. Et `mob.gd` appelle `type.behavior.update(self, delta)` dans `_physics_process`.
 
 Test d'acceptation : le jeu est indiscernable de la version précédente.
 
@@ -153,8 +154,9 @@ extends MobBehavior
 
 @export var turn_rate: float = 2.0
 
-func on_spawn(mob: RigidBody2D, direction: float, speed: float) -> void:
-	mob.set_meta(&"speed", speed)
+## Pas de on_spawn : celui de la classe de base pose déjà la vitesse
+## et la vélocité initiale. Le redéfinir sans appeler super() est
+## précisément l'erreur qui laisserait get_meta("speed") sans valeur.
 
 func update(mob: RigidBody2D, delta: float) -> void:
 	var player := mob.get_tree().get_first_node_in_group(&"player")
@@ -195,6 +197,8 @@ Ajouter un comportement = un fichier, zéro ligne touchée ailleurs. C'est la d�
 
 Aujourd'hui `main.gd` fait `$HUD.update_score(score)` : la logique de jeu connaît l'existence de l'interface, et son chemin dans l'arbre.
 
+L'autoload actuel mélange deux responsabilités : l'état de jeu et la persistance. On les sépare ici — `SaveState` garde le highscore et la sauvegarde, `GameState` deviendra la machine à états à l'étape 4.1. Un autoload par responsabilité.
+
 ```gdscript
 class_name ScoreKeeper
 extends Node
@@ -210,7 +214,7 @@ var score: int:
 func add(points: int) -> void:
 	_score += points
 	score_changed.emit(_score)
-	if _score > GameState.high_score:
+	if _score > SaveState.high_score:
 		high_score_beaten.emit(_score)
 
 func reset() -> void:
@@ -232,7 +236,7 @@ Le HUD s'abonne, et `main.gd` ne le connaît plus.
 
 ### Étape 4.1 — la FSM globale que les originaux n'avaient pas
 
-C'est le niveau 1 du corpus, et sa conclusion la plus contre-intuitive : **aucun des huit originaux n'a d'état global unique.** Ce qui en tient lieu est un ensemble de drapeaux posés par des routines différentes, et la moitié de leurs glitches vient de là.
+C'est le niveau 1 du corpus, et sa conclusion la plus contre-intuitive : **chez Pokémon, l'état global n'est pas une valeur unique** mais un ensemble de drapeaux posés par trois routines différentes, dont une seule les remet à zéro — d'où le glitch Trainer-Fly et son menu qui ne répond plus. C'est vérifié pour ce jeu ; pour les autres du corpus, c'est plausible mais non établi.
 
 ```gdscript
 extends Node                          ## autoload GameState
@@ -388,7 +392,6 @@ func _ready() -> void:
 		var mob := mob_scene.instantiate() as RigidBody2D
 		mob.hide()
 		mob.set_physics_process(false)
-		mob.ground_check_phase = i % 4      ## échelonnement, façon anneaux de Sonic
 		add_child(mob)
 		_pool.append(mob)
 
@@ -434,6 +437,9 @@ var _band_height: float = 0.0
 func _ready() -> void:
 	assert(not band_textures.is_empty(), "il faut au moins une texture de bande")
 	_band_height = float(band_textures[0].get_height())
+	for t in band_textures:
+		assert(float(t.get_height()) == _band_height,
+			"toutes les bandes doivent avoir la meme hauteur")
 	var count := _needed_band_count(get_viewport_rect().size.y)
 	for i in count:
 		var band := Sprite2D.new()

@@ -68,7 +68,7 @@ De quoi répondre sans relire le corpus. Chaque point renvoie au fichier qui le 
 
 Le test qui tranche les cas limites, tiré de F-Zero : **est-ce que la condition de sortie de l'état change ?** Si oui, c'est une autre machine, pas un paramètre.
 
-Nuance importante : **aucun des huit originaux n'a d'état global unique.** Ce qui en tient lieu est un ensemble de drapeaux et d'index indépendants, et la moitié des glitches du corpus vient de là. Un `enum` avec un seul champ courant et un seul point d'écriture est ce que l'original ne pouvait pas se permettre.
+Nuance importante, avec sa portée exacte : **chez Pokémon, l'état global n'est pas une valeur unique** mais un ensemble de drapeaux et d'index posés par des routines différentes (`wIsInBattle`, `wCurMapScript`, `wStatusFlags7`, `wMiscFlags`) — c'est vérifié dans le désassemblage, et c'est la cause directe du glitch Trainer-Fly. Pour les sept autres jeux, la vérification n'a pas porté sur ce point précis : l'absence de FSM globale explicite y est plausible, pas établie. Dans tous les cas la leçon tient — un `enum` avec un seul champ courant et un seul point d'écriture est ce que Godot rend gratuit.
 
 ### La chaîne d'indirections partagées
 
