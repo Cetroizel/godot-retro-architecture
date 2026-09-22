@@ -1,0 +1,20 @@
+# Système
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Éditeurs
+.vscode/
+.idea/
+*.swp
+*~
+
+# Godot — garde-fou si un projet de test atterrit ici un jour.
+# C'est exactement l'oubli qui a fait peser 105 Mo au dépôt dodge-the-creeps.
+.godot/
+/android/
+*.exe
+*.pck
+*.zip
+build/
+export_presets.cfg
