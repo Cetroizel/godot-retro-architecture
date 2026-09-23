@@ -131,18 +131,25 @@ Les affirmations qui n'ont **pas** pu être vérifiées sont signalées comme te
 
 La phase d'analyse est **refermée** : la suite se joue dans Godot, pas dans de nouveaux fichiers Markdown. Voir [`prochaines-etapes.md`](./prochaines-etapes.md).
 
-**Étape en cours** — le tutoriel officiel « Your First 2D Game » (Dodge the Creeps) est terminé, et sert de POC volontaire pour appliquer un pattern par modification :
+**Étape en cours** — le tutoriel officiel « Your First 2D Game » (Dodge the Creeps) est terminé, et sert de POC volontaire. Le parti pris est d'y faire entrer **le plus de concepts possible**, y compris là où un vrai projet de cette taille s'en passerait : chaque étape de la roadmap dit ce qu'on ferait « en vrai projet », pour que le surdimensionnement reste un choix conscient.
 
-| Modification | Pattern | État |
+Le highscore persistant (Autoload + sérialisation JSON) est antérieur à la roadmap. Le plan qui suit :
+
+| Phase | Étapes | Patterns |
 |---|---|---|
-| Highscore persistant | — (Autoload + JSON) | fait |
-| Nouveau type de mob | **Strategy** | à faire — le prochain |
-| Score découplé de l'UI | **Observer** | à faire |
-| Power-up temporaire | **State** | à faire |
-| Difficulté progressive | **Flyweight** | à faire |
-| Nouveau sprite | — (travail d'asset) | à faire |
+| 0 — assainir le terrain | 0.1 typage statique | — |
+| 1 — les données avant le comportement | 1.1 `MobType` en Resource · 1.2 `MobSpawner` | Composition, Flyweight · Factory |
+| 2 — le comportement interchangeable | 2.1 Strategy à comportement identique · 2.2 poursuite et zigzag | Strategy |
+| 3 — découpler l'affichage | 3.1 le score | Observer |
+| 4 — l'état, à deux échelles | 4.1 FSM globale · 4.2 power-up | Singleton et machine à états · State |
+| 5 — la difficulté data-driven | 5.1 `WaveData` | Flyweight, entité de jointure promue |
+| 6 — mesurer avant d'optimiser | 6.1 pool · 6.2 fond défilant | Object Pool · fenêtre glissante |
+| 7 — persistance et tests | 7.1 sauvegarde versionnée · 7.2 tests gdUnit4 | Memento · — |
+| 8 — le bonus, si l'envie est là | 8.1 remapping · 8.2 déblocages | Command · flag set |
 
-Object Pool est volontairement exclu de cette liste : le critère n'est pas « beaucoup d'objets » mais « beaucoup d'objets **créés et détruits en rafale** » (le cas de référence étant les 32 anneaux dispersés de Sonic dans une seule frame), et Dodge the Creeps spawne ses mobs un par un.
+**L'état d'avancement fait foi sur les [jalons GitHub](https://github.com/Cetroizel/dodge-the-creeps/milestones), pas ici.** Ce tableau décrit le plan et n'est pas mis à jour à chaque session. Une étape correspond à une issue ; la session du jour est donnée par le prompt d'amorçage, qui contient le corps de l'issue à traiter.
+
+Sur Object Pool, le critère reste celui du corpus : ce n'est pas « beaucoup d'objets » mais « beaucoup d'objets **créés et détruits en rafale** » (le cas de référence étant les 32 anneaux dispersés de Sonic dans une seule frame), et Dodge the Creeps spawne ses mobs un par un. Un vrai projet de cette taille ne l'utiliserait donc pas. Il entre quand même à l'étape 6.1, mais **justifié par une mesure** : pousser le spawn jusqu'à 200 mobs, relever le profiler, implémenter, remesurer.
 
 **Étape suivante** — un RPG au tour par tour, qui réutilise directement le même outillage à plus grande échelle : le modèle `PokemonSpecies`/`Pokemon` presque tel quel, Strategy pour les cinq actions de combat, State pour le déroulement d'un tour (modèle Final Fantasy et non Pokémon, à cause du parti de 4), Observer pour l'UI, Command pour le journal de combat.
 

@@ -640,11 +640,11 @@ Trois familles de concepts du corpus n'ont **rien à faire** dans Dodge the Cree
 
 | Concept | Pourquoi ça ne rentre pas | Où ça rentrera |
 |---|---|---|
-| **Fenêtre glissante / streaming** | l'écran est fixe, il n'y a rien à faire défiler ni à décompresser en avance | le donjon grid-based, ou un raycaster |
+| **Streaming de niveau** | l'écran est fixe : au-delà du fond défilant de l'[étape 6.2](#étape-62--le-fond-défilant-à-bandes-recyclées), il n'y a pas de monde à décompresser en avance de la caméra | le donjon grid-based, ou un raycaster |
 | **Capteurs et collision directionnelle** | c'est de la physique de plateforme : pentes, boucles, sol traversable par le bas | un platformer, si l'envie vient |
 | **Chaîne d'indirections de décor** | il n'y a pas de décor à décrire — un `ColorRect` et c'est tout | le donjon grid-based, où layouts et tuiles partagées reprennent tout leur sens |
 
-Une exception possible si tu veux quand même toucher au streaming : un **fond défilant à tuiles recyclées**, où deux bandes alternent comme les deux `Block_Buffer` de [Mario](./super-mario-bros). C'est honnête et ça se fait en une session — mais c'est un ajout gratuit au jeu, pas une nécessité.
+La fenêtre glissante, elle, a trouvé sa place à l'[étape 6.2](#étape-62--le-fond-défilant-à-bandes-recyclées) : le fond défilant à bandes recyclées en est la version honnête pour un écran fixe. Chaque bande qui sort de l'écran y est recyclée au-dessus des autres, sur le principe des deux `Block_Buffer` de [Mario](./super-mario-bros). Un ajout au jeu plutôt qu'une nécessité — c'est le parti pris de cette roadmap.
 
 ---
 
