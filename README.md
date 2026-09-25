@@ -15,7 +15,7 @@ Chaque jeu est décortiqué selon la même grille en 4 niveaux :
 
 Quand un bug ou glitch bien documenté illustre une leçon d'architecture, il est ajouté en illustration.
 
-Le prompt réutilisable pour appliquer cette grille à un nouveau jeu est dans [`_framework/prompt-template.md`](./_framework/prompt-template.md). Les design patterns reconnus au fil des analyses sont centralisés dans [`_framework/design-patterns.md`](./_framework/design-patterns.md), les leçons tirées des glitches illustratifs dans [`_framework/lecons-bugs.md`](./_framework/lecons-bugs.md), le vocabulaire technique dans [`_framework/glossaire.md`](./_framework/glossaire.md), et une vue d'ensemble comparant les 8 jeux entre eux dans [`_framework/synthese-inter-jeux.md`](./_framework/synthese-inter-jeux.md).
+Le prompt réutilisable pour appliquer cette grille à un nouveau jeu est dans [`_framework/prompt-template.md`](./_framework/prompt-template.md). Les design patterns reconnus au fil des analyses sont centralisés dans [`_framework/design-patterns.md`](./_framework/design-patterns.md), les leçons tirées des glitches illustratifs dans [`_framework/lecons-bugs.md`](./_framework/lecons-bugs.md), le vocabulaire technique dans [`_framework/glossaire.md`](./_framework/glossaire.md), le rangement d'un projet Godot dans [`_framework/organisation-fichiers.md`](./_framework/organisation-fichiers.md), et une vue d'ensemble comparant les 8 jeux entre eux dans [`_framework/synthese-inter-jeux.md`](./_framework/synthese-inter-jeux.md).
 
 Cette phase d'analyse se referme avec [`prochaines-etapes.md`](./prochaines-etapes.md), qui propose d'appliquer concrètement ces patterns en pratique plutôt que de continuer à empiler des analyses.
 

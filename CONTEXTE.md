@@ -51,6 +51,7 @@ _framework/
 ├── design-patterns.md         12 patterns, avec l'idiome Godot de chacun
 ├── lecons-bugs.md             6 familles de bugs + check-list
 ├── glossaire.md               vocabulaire technique
+├── organisation-fichiers.md   rangement d'un projet Godot : par feature, nommage, ce qu'on versionne
 └── synthese-inter-jeux.md     vue transversale des 8 jeux
 pokemon-rouge-bleu/  zelda-1/  super-mario-bros/  zelda-2/
 final-fantasy-1/     metroid/  sonic/            fzero/
@@ -137,7 +138,7 @@ Le highscore persistant (Autoload + sérialisation JSON) est antérieur à la ro
 
 | Phase | Étapes | Patterns |
 |---|---|---|
-| 0 — assainir le terrain | 0.1 typage statique | — |
+| 0 — assainir le terrain | 0.1 typage statique · 0.2 rangement par feature | — |
 | 1 — les données avant le comportement | 1.1 `MobType` en Resource · 1.2 `MobSpawner` | Composition, Flyweight · Factory |
 | 2 — le comportement interchangeable | 2.1 Strategy à comportement identique · 2.2 poursuite et zigzag | Strategy |
 | 3 — découpler l'affichage | 3.1 le score | Observer |

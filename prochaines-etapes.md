@@ -36,6 +36,20 @@ func update_high_score(score: int) -> void:
 
 **Écho au corpus** : les trois bugs de [Final Fantasy](./final-fantasy-1) sont des confusions de champ entre deux valeurs du même type. Le typage seul ne les aurait pas attrapés (un index et un taux sont tous deux des `int`), mais c'est la première ligne de défense de la famille.
 
+### Étape 0.2 — ranger par feature
+
+Le dépôt est encore à plat, comme le tutoriel l'a laissé : cinq scènes et leurs scripts à la racine, tous les assets dans `art/`. L'étape 1.1 va créer `mob/types/` ; autant que `mob/` existe avant.
+
+Le détail — principe, arborescence cible, correspondance fichier par fichier, pas à pas — est dans [`_framework/organisation-fichiers.md`](./_framework/organisation-fichiers.md), §10. L'essentiel :
+
+- un dossier par feature (`main/`, `player/`, `mob/`, `ui/`), un dossier `autoload/` où `GameState.gd` devient `game_state.gd` ;
+- les assets renommés en `snake_case` et rangés avec la feature qui les utilise ;
+- **tout se fait depuis le dock FileSystem** de Godot, pour que les `.uid` et les `.import` suivent et que les références soient réécrites.
+
+Le test d'acceptation est dans Git plutôt qu'à l'écran : `git status` ne montre que des `renamed:`, jamais une paire `deleted` / `new file`, et le jeu tourne pareil. Aucune ligne de code ne change dans ce commit.
+
+**En vrai projet** : oui, et le plus tôt possible — ranger coûte un commit à cinq fichiers, beaucoup plus à cinquante.
+
 ---
 
 ## Phase 1 — les données avant le comportement
@@ -74,7 +88,7 @@ func setup(p_type: MobType) -> void:
 	$AnimatedSprite2D.play()
 ```
 
-Créer trois `.tres` : `mob_walk.tres`, `mob_fly.tres`, `mob_swim.tres`. **Supprimer `fastmob.tscn`** — il devient un quatrième `.tres` avec une vitesse plus haute, pas une scène.
+Créer trois `.tres` dans `mob/types/`, nommés d'après leur animation : `walk.tres`, `fly.tres`, `swim.tres`. **Supprimer `fastmob.tscn`** — il devient un quatrième `.tres`, `fast.tres`, avec une vitesse plus haute, pas une scène. Et retirer de `mob.gd` le `speed_factor` resté du premier essai : la vitesse vit désormais dans `MobType`.
 
 **En vrai projet** : justifié dès trois variantes. C'est le pattern le plus rentable du corpus.
 
@@ -198,6 +212,8 @@ Ajouter un comportement = un fichier, zéro ligne touchée ailleurs. C'est la d�
 Aujourd'hui `main.gd` fait `$HUD.update_score(score)` : la logique de jeu connaît l'existence de l'interface, et son chemin dans l'arbre.
 
 L'autoload actuel mélange deux responsabilités : l'état de jeu et la persistance. On les sépare ici — `SaveState` garde le highscore et la sauvegarde, `GameState` deviendra la machine à états à l'étape 4.1. Un autoload par responsabilité.
+
+`ScoreKeeper`, lui, **n'est pas un autoload** : c'est un nœud enfant de `Main` (`main/score_keeper.gd`), que le HUD reçoit par `@export var score_keeper: ScoreKeeper`. Le score appartient à une partie, pas au programme. Et l'enregistrer en autoload sous le nom `ScoreKeeper` alors que le script déclare `class_name ScoreKeeper` est refusé par Godot : la classe masquerait le singleton.
 
 ```gdscript
 class_name ScoreKeeper
@@ -568,7 +584,7 @@ func test_selection_de_type_respecte_les_poids() -> void:
 	## 10 000 tirages, un type à poids 0 ne doit jamais sortir.
 	var rng := RandomNumberGenerator.new()
 	rng.seed = 12345
-	var wave := load("res://data/waves/wave_1.tres") as WaveData
+	var wave := load("res://wave/waves/wave_01.tres") as WaveData
 	## ... comptage et assertions
 ```
 
